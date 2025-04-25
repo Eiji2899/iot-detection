@@ -13,7 +13,7 @@ app = func.FunctionApp()
 DATASET_STORAGE_CONN = os.getenv("DatasetStorage")
 OUTPUT_CONTAINER = "anomalies"
 
-@app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="AzureWebJobsStorage")
+@app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="DATASET_STORAGE_CONN")
 def blob_trigger(myblob: func.InputStream):
     logging.info(f"Triggered blob: {myblob.name} ({myblob.length} bytes)")
 
