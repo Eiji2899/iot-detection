@@ -10,7 +10,7 @@ from datetime import datetime
 app = func.FunctionApp()
 
 # Load connection string for custom dataset storage
-DATASET_STORAGE_CONN = os.getenv("DatasetStorage")
+DATASET_STORAGE_CONN = os.getenv("AzureWebJobsStorage")
 if not DATASET_STORAGE_CONN:
     logging.error("DatasetStorage connection string not set.")
 
