@@ -4,9 +4,6 @@
 
 name: Build and deploy Python project to Azure Function App - iot-funcapp01210
 
-env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'functions/'
-
 on:
   push:
     branches:
