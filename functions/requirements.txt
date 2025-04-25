@@ -4,5 +4,9 @@
 
 azure-functions
 datetime
-json
 logging
+pandas
+numpy
+azure.storage.blob
+io
+os
