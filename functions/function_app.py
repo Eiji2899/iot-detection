@@ -18,9 +18,9 @@ OUTPUT_CONTAINER = "anomalies"
 
 @app.function_name(name="HttpTrigger1")
 @app.route(route="req")
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest) -> str:
     user = req.params.get("user")
-    return func.HttpResponse(f"Hello, {user}!")
+    return f"Hello, {user}!"
 
 # IMPORTANT: The connection attribute should match the application setting key ("DatasetStorage")
 @app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="DatasetStorage")
