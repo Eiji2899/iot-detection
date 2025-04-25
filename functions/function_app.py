@@ -11,9 +11,13 @@ app = func.FunctionApp()
 
 # Load connection string for custom dataset storage
 DATASET_STORAGE_CONN = os.getenv("DatasetStorage")
+if not DATASET_STORAGE_CONN:
+    logging.error("DatasetStorage connection string not set.")
+
 OUTPUT_CONTAINER = "anomalies"
 
-@app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="DATASET_STORAGE_CONN")
+# IMPORTANT: The connection attribute should match the application setting key ("DatasetStorage")
+@app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="DatasetStorage")
 def blob_trigger(myblob: func.InputStream):
     logging.info(f"Triggered blob: {myblob.name} ({myblob.length} bytes)")
 
