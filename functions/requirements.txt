@@ -3,8 +3,6 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 
 azure-functions
-datetime
-logging
 pandas
 numpy
-azure.storage.blob
+azure-storage-blob
