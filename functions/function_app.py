@@ -1,6 +1,6 @@
 import azure.functions as func
 import logging
-import pandas as pd
+#import pandas as pd
 import numpy as np
 import os
 from azure.storage.blob import BlobServiceClient
