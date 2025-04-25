@@ -16,6 +16,12 @@ if not DATASET_STORAGE_CONN:
 
 OUTPUT_CONTAINER = "anomalies"
 
+@app.function_name(name="HttpTrigger1")
+@app.route(route="req")
+def main(req):
+    user = req.params.get("user")
+    return f"Hello, {user}!"
+
 # IMPORTANT: The connection attribute should match the application setting key ("DatasetStorage")
 @app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="DatasetStorage")
 def blob_trigger(myblob: func.InputStream):
