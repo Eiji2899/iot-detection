@@ -51,6 +51,7 @@ jobs:
         with:
           name: python-app
           path: |
+            cd functions
             release.zip
             !venv/
 
