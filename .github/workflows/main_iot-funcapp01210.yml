@@ -42,16 +42,13 @@ jobs:
       # Optional: Add step to run tests here
 
       - name: Zip artifact for deployment
-        run: |
-          cd functions
-          zip release.zip ./* -r
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
-            cd functions
             release.zip
             !venv/
 
