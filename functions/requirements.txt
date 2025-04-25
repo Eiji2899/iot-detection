@@ -8,5 +8,3 @@ logging
 pandas
 numpy
 azure.storage.blob
-io
-os
