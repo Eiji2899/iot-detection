@@ -4,4 +4,4 @@
 
 azure-functions
 #adding down
-azurefunctions-extensions-bindings-blob
+#azurefunctions-extensions-bindings-blob
