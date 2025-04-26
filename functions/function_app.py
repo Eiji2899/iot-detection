@@ -1,13 +1,11 @@
 import azure.functions as func
 import logging
-
-#adding down
 import csv
-import io
-import azure.storage.blob
-from io import StringIO
-from azure.storage.blob import BlobServiceClient
-#added up
+
+#////// below are commented due to issue ////////////////
+#from io import StringIO
+#from azure.storage.blob import BlobServiceClient
+#////////////////////////////////////////////
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -32,6 +30,7 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
              status_code=200
         )
 
+# ////////////// sample workibng blob trigger code /////////////
 
 #@app.blob_trigger(arg_name="myblob", path="rawdata/{name}",
 #                               connection="iotstorage02123_STORAGE") 
@@ -39,6 +38,8 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
 #    logging.info(f"Python blob trigger function processed blob"
 #                f"Name: {myblob.name}"
 #                f"Blob Size: {myblob.length} bytes")
+
+# //////////////////////////////////
 
 OUTPUT_CONTAINER = "anomalies"
 

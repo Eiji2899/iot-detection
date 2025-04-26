@@ -3,14 +3,18 @@
 # Manually managing azure-functions-worker may cause unexpected issues
 
 azure-functions
+
+# //////////// below are issues ///////////////
+
 #adding down
 #azurefunctions-extensions-bindings-blob
 #azure-storage-blob
-azure-storage-blob
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-scipy
-python-dotenv
+#pandas
+#numpy
+#matplotlib
+#seaborn
+#scikit-learn
+#scipy
+#python-dotenv
+
+# /////////////////////////////
