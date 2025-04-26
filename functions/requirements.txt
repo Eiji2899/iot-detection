@@ -6,3 +6,11 @@ azure-functions
 #adding down
 #azurefunctions-extensions-bindings-blob
 #azure-storage-blob
+azure-storage-blob
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+scipy
+python-dotenv

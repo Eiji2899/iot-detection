@@ -3,8 +3,9 @@ import logging
 
 #adding down
 import csv
-#from datetime import datetime
-#from azure.storage.blob import BlobServiceClient
+from io import StringIO
+from datetime import datetime
+from azure.storage.blob import BlobServiceClient
 #added up
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -42,36 +43,37 @@ OUTPUT_CONTAINER = "anomalies"
 
 @app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="iotstorage02123_STORAGE")
 def blob_trigger(myblob: func.InputStream):
-    logging.info(f"Blob trigger processed: {myblob.name}, size: {myblob.length} bytes")
+    logging.info(f"Python blob trigger function processed blob. "
+                 f"Name: {myblob.name} | Size: {myblob.length} bytes")
 
     try:
-        content = myblob.read().decode('utf-8').splitlines()
-        reader = csv.DictReader(content)
+        # Read the blob as CSV
+        csv_data = myblob.read().decode('utf-8')
+        df = pd.read_csv(StringIO(csv_data))
 
-        anomalies = []
-        for row in reader:
-            try:
-                temp = float(row.get('temperature', 0))
-                if temp < -50 or temp > 50:  # Example anomaly condition
-                    anomalies.append(row)
-            except Exception as e:
-                logging.warning(f"Skipping invalid row: {row} | Error: {e}")
-
-        if not anomalies:
-            logging.info("No anomalies found.")
+        # Check if 'temperature' column exists
+        if 'temperature' not in df.columns:
+            logging.warning("No 'temperature' column found in the dataset. Skipping anomaly detection.")
             return
 
-        # Prepare CSV content manually
-        output = "temperature\n"
-        for anomaly in anomalies:
-            output += f"{anomaly['temperature']}\n"
+        # Perform Z-score anomaly detection
+        df['zscore'] = (df['temperature'] - df['temperature'].mean()) / df['temperature'].std()
+        anomalies = df[df['zscore'].abs() > 3]
 
-        # Upload anomaly CSV
-        blob_service_client = BlobServiceClient.from_connection_string(iotstorage02123_STORAGE)
-        anomaly_blob = blob_service_client.get_blob_client(container=OUTPUT_CONTAINER, blob="anomalies.csv")
-        anomaly_blob.upload_blob(output, overwrite=True)
+        if anomalies.empty:
+            logging.info("No anomalies detected.")
+            return
 
-        logging.info(f"Anomalies uploaded successfully. Total: {len(anomalies)}")
+        # Prepare anomalies CSV
+        output_csv = anomalies.to_csv(index=False)
+
+        # Save anomalies to the anomalies container
+        blob_service = BlobServiceClient.from_connection_string(iotstorage02123_STORAGE)
+        filename = f"anomalies_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
+        anomaly_blob = blob_service.get_blob_client(container=OUTPUT_CONTAINER, blob=filename)
+        anomaly_blob.upload_blob(output_csv, overwrite=True)
+
+        logging.info(f"Anomalies saved to {filename} with {len(anomalies)} records.")
 
     except Exception as e:
-        logging.error(f"Error processing blob: {e}")
+        logging.error(f"Error during blob processing: {e}")
