@@ -3,6 +3,9 @@ import logging
 
 #adding down
 import csv
+from io import StringIO
+from datetime import datetime
+from azure.storage.blob import BlobServiceClient
 #added up
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -51,7 +54,7 @@ def blob_trigger(myblob: func.InputStream):
         rows = []
 
         for row in csv_reader:
-            if 'temperature' in row and row['temperature']:
+            if row.get('temperature'):  # Use safer dictionary access
                 try:
                     temp = float(row['temperature'])
                     temperatures.append(temp)
@@ -63,8 +66,15 @@ def blob_trigger(myblob: func.InputStream):
             logging.warning("No valid temperature data found.")
             return
 
-        # Simple Anomaly Detection: Find values outside reasonable range (example: < -50 or > 50 Celsius)
-        anomalies = [row for row in rows if float(row['temperature']) < -50 or float(row['temperature']) > 50]
+        # Define anomaly range (customize as needed)
+        anomaly_lower_bound = -50.0
+        anomaly_upper_bound = 50.0
+
+        # Simple Anomaly Detection
+        anomalies = [
+            row for row in rows 
+            if float(row['temperature']) < anomaly_lower_bound or float(row['temperature']) > anomaly_upper_bound
+        ]
 
         if not anomalies:
             logging.info("No anomalies detected.")
@@ -77,7 +87,7 @@ def blob_trigger(myblob: func.InputStream):
         writer.writerows(anomalies)
 
         # Upload anomalies to storage
-        blob_service = BlobServiceClient.from_connection_string(STORAGE_CONN)
+        blob_service = BlobServiceClient.from_connection_string(connection="iotstorage02123_STORAGE")
         filename = f"anomalies_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
         anomaly_blob = blob_service.get_blob_client(container=OUTPUT_CONTAINER, blob=filename)
         anomaly_blob.upload_blob(output_csv.getvalue(), overwrite=True)
