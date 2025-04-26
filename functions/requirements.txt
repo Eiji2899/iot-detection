@@ -5,4 +5,4 @@
 azure-functions
 #adding down
 #azurefunctions-extensions-bindings-blob
-azure-storage-blob
+#azure-storage-blob
