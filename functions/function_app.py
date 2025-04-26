@@ -36,7 +36,7 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
 #                f"Name: {myblob.name}"
 #                f"Blob Size: {myblob.length} bytes")
 
-OUTPUT_CONTAINER = "anomalies"
+OUTPUT_CONTAINER = "anomalies/{name}"
 
 @app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="iotstorage02123_STORAGE")
 def blob_trigger(myblob: func.InputStream):
