@@ -3,6 +3,7 @@ import logging
 
 #adding down
 import csv
+import azurefunctions.extensions.bindings.blob as blob
 #added up
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -77,7 +78,7 @@ def blob_trigger(myblob: func.InputStream):
         writer.writerows(anomalies)
 
         # Upload anomalies to storage
-        blob_service = BlobServiceClient.from_connection_string(STORAGE_CONN)
+        blob_service = BlobServiceClient.from_connection_string(iotstorage02123_STORAGE)
         filename = f"anomalies_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
         anomaly_blob = blob_service.get_blob_client(container=OUTPUT_CONTAINER, blob=filename)
         anomaly_blob.upload_blob(output_csv.getvalue(), overwrite=True)
