@@ -42,56 +42,36 @@ OUTPUT_CONTAINER = "anomalies"
 
 @app.blob_trigger(arg_name="myblob", path="rawdata/{name}", connection="iotstorage02123_STORAGE")
 def blob_trigger(myblob: func.InputStream):
-    logging.info(f"Processing blob: {myblob.name} (Size: {myblob.length} bytes)")
+    logging.info(f"Blob trigger processed: {myblob.name}, size: {myblob.length} bytes")
 
     try:
-        # Read the CSV data from the blob
-        csv_content = myblob.read().decode('utf-8')
-        csv_reader = csv.DictReader(io.StringIO(csv_content))
+        content = myblob.read().decode('utf-8').splitlines()
+        reader = csv.DictReader(content)
 
-        temperatures = []
-        rows = []
-
-        for row in csv_reader:
-            if row.get('temperature'):  # Use safer dictionary access
-                try:
-                    temp = float(row['temperature'])
-                    temperatures.append(temp)
-                    rows.append(row)
-                except ValueError:
-                    logging.warning(f"Invalid temperature value: {row['temperature']}")
-
-        if not temperatures:
-            logging.warning("No valid temperature data found.")
-            return
-
-        # Define anomaly range (customize as needed)
-        anomaly_lower_bound = -50.0
-        anomaly_upper_bound = 50.0
-
-        # Simple Anomaly Detection
-        anomalies = [
-            row for row in rows 
-            if float(row['temperature']) < anomaly_lower_bound or float(row['temperature']) > anomaly_upper_bound
-        ]
+        anomalies = []
+        for row in reader:
+            try:
+                temp = float(row.get('temperature', 0))
+                if temp < -50 or temp > 50:  # Example anomaly condition
+                    anomalies.append(row)
+            except Exception as e:
+                logging.warning(f"Skipping invalid row: {row} | Error: {e}")
 
         if not anomalies:
-            logging.info("No anomalies detected.")
+            logging.info("No anomalies found.")
             return
 
-        # Prepare anomaly CSV content
-        output_csv = io.StringIO()
-        writer = csv.DictWriter(output_csv, fieldnames=anomalies[0].keys())
-        writer.writeheader()
-        writer.writerows(anomalies)
+        # Prepare CSV content manually
+        output = "temperature\n"
+        for anomaly in anomalies:
+            output += f"{anomaly['temperature']}\n"
 
-        # Upload anomalies to storage
-        blob_service = BlobServiceClient.from_connection_string(connection="iotstorage02123_STORAGE")
-        filename = f"anomalies_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.csv"
-        anomaly_blob = blob_service.get_blob_client(container=OUTPUT_CONTAINER, blob=filename)
-        anomaly_blob.upload_blob(output_csv.getvalue(), overwrite=True)
+        # Upload anomaly CSV
+        blob_service_client = BlobServiceClient.from_connection_string(iotstorage02123_STORAGE)
+        anomaly_blob = blob_service_client.get_blob_client(container=OUTPUT_CONTAINER, blob="anomalies.csv")
+        anomaly_blob.upload_blob(output, overwrite=True)
 
-        logging.info(f"Anomalies saved to {filename} with {len(anomalies)} records.")
+        logging.info(f"Anomalies uploaded successfully. Total: {len(anomalies)}")
 
     except Exception as e:
         logging.error(f"Error processing blob: {e}")
