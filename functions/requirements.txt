@@ -4,6 +4,4 @@
 
 azure-functions
 #adding down
-pandas
-numpy
 azure-storage-blob
