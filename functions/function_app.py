@@ -2,11 +2,7 @@ import azure.functions as func
 import logging
 
 #adding down
-import os
-from azure.storage.blob import BlobServiceClient
-from io import StringIO
-import csv
-from datetime import datetime
+
 #added up
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
