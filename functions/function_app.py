@@ -3,7 +3,6 @@ import logging
 
 #adding down
 import csv
-from io import StringIO
 #from datetime import datetime
 #from azure.storage.blob import BlobServiceClient
 #added up
@@ -48,7 +47,7 @@ def blob_trigger(myblob: func.InputStream):
     try:
         # Read the CSV data from the blob
         csv_content = myblob.read().decode('utf-8')
-        csv_reader = csv.DictReader(StringIO(csv_content))
+        csv_reader = csv.DictReader(io.StringIO(csv_content))
 
         temperatures = []
         rows = []
@@ -81,7 +80,7 @@ def blob_trigger(myblob: func.InputStream):
             return
 
         # Prepare anomaly CSV content
-        output_csv = StringIO()
+        output_csv = io.StringIO()
         writer = csv.DictWriter(output_csv, fieldnames=anomalies[0].keys())
         writer.writeheader()
         writer.writerows(anomalies)
