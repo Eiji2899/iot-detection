@@ -2,7 +2,7 @@ import azure.functions as func
 import logging
 
 #adding down
-from azure.storage.blob import BlobServiceClient
+import azure.storage.blob
 import csv
 #added up
 
