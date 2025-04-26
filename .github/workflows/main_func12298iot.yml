@@ -33,6 +33,9 @@ jobs:
         run: |
           python -m venv venv
           source venv/bin/activate
+          pip install pandas
+          pip install numpy
+          pip install azure-storage-blob
 
       - name: Install dependencies
         run: |
